@@ -1,0 +1,74 @@
+server:
+  port: 9091
+
+spring:
+  application:
+    name: API-GATEWAY
+
+  config:
+    import: configserver:http://127.0.0.1:9296
+
+#  spring:
+#    cloud:
+#      loadbalancer:
+#        enabled: true
+
+  cloud:
+    loadbalancer:
+      enabled: true
+
+    gateway:
+      routes:
+        - id: ORDER-SERVICE
+          uri: lb://ORDER-SERVICE
+          predicates:
+            - Path=/order/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: ORDER-SERVICE
+                fallbackuri: forward:/orderServiceFallBack
+
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 2
+                redis-rate-limiter.burstCapacity: 10
+
+
+        - id: PAYMENT-SERVICE
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: PAYMENT-SERVICE
+                fallbackuri: forward:/paymentServiceFallBack
+
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 2
+                redis-rate-limiter.burstCapacity: 10
+
+        - id: PRODUCT-SERVICE
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/product/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: PRODUCT-SERVICE
+                fallbackuri: forward:/productServiceFallBack
+
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 2
+                redis-rate-limiter.burstCapacity: 10
+
+okta:
+  oauth2:
+    issuer: https://dev-63042426.okta.com/oauth2/default
+    audience: api://defaults
+    client-id: 0oaa0957tuHvuPp7j5d7
+    client-secret: Gagzcfdy6D3KA93lCsoO8pWcbA96wPOX5kUqWYjK
+    scopes: openid, profile, email, offline_access, internal

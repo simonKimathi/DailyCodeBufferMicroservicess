@@ -1,0 +1,39 @@
+
+spring:
+  config:
+    import: optional:configserver:http://127.0.0.1:9296
+  datasource:
+    url: jdbc:h2:mem:order
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-63042426.okta.com/oauth2/default
+
+      client:
+        registration:
+          internal-client:
+            provider: okta
+            authorization-grant-type: client_credentials
+            scope: internal
+            client-id: 0oaa0957tuHvuPp7j5d7
+            client-secret: Gagzcfdy6D3KA93lCsoO8pWcbA96wPOX5kUqWYjK
+        provider:
+          okta:
+            issuer-uri: https://dev-63042426.okta.com/oauth2/default
+
+
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
+#    service-url:
+#      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
